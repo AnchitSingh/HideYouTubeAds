@@ -12,9 +12,11 @@ const checkConditionsAndRunCode = () => {
         const video = document.querySelector('video');
 
         // Run the code to skip the ad
-        video.currentTime = video.duration;
-        video.volume = 0;
-        console.log('Ad skipped!');
+        if(video){
+        	video.currentTime = video.duration;
+        	video.volume = 0;
+        	console.log('Ad skipped!');
+        }
     }
 };
 
@@ -24,34 +26,24 @@ const intervalId = setInterval(checkConditionsAndRunCode, 100);
 // Optionally, you can clear the interval when needed, for example, when the page unloads
 // clearInterval(intervalId);
 
-// Function to set elements with the pattern "*-ad-*" to display: none
 const hideElementsWithAdPattern = () => {
-    const elementsWithAdPattern = document.querySelectorAll('[id*="-ad-"], [class*="-ad-"]');
+    const elementsWithAdPattern = document.querySelectorAll('[id*="-ad-"], [class*="-ad-"]:not(#container [id*="-ad-"], #container [class*="-ad-"])');
 
     elementsWithAdPattern.forEach(element => {
         element.style.display = 'none';
     });
 };
 
-// Function to be called when mutations are observed
 const handleMutations = (mutationsList, observer) => {
     for (const mutation of mutationsList) {
         if (mutation.type === 'childList') {
-            // New elements might have been added, so hide elements with the pattern again
             hideElementsWithAdPattern();
         }
     }
 };
 
-// Set initial elements to display: none
 hideElementsWithAdPattern();
 
-// Create a Mutation Observer to watch for changes in the DOM
 const observer = new MutationObserver(handleMutations);
-
-// Configure and start the observer
 const observerConfig = { childList: true, subtree: true };
 observer.observe(document.body, observerConfig);
-
-// Optionally, you can disconnect the observer when needed, for example, when the page unloads
-// observer.disconnect();
